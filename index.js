@@ -20,53 +20,66 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    }
 });
 
 async function run() {
-  try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    try {
+        // Connect the client to the server	(optional starting in v4.7)
+        await client.connect();
 
-    const artCollection = client.db('artCraftDB').collection('artCraft');
+        const artCollection = client.db('artCraftDB').collection('artCraft');
 
 
-    app.get('/artCraft', async (req, res) =>{
-        const cursor = artCollection.find();
-        const result = await cursor.toArray();
-        res.send(result);
-    })
-// ------------------------------------------- start
-    app.get('/artCraft/:id', async (req, res) => {
-        const id = req.params.id;
-        const query = {_id: new ObjectId(id)}
-        const result = await artCollection.findOne(query)
-        res.send(result);
-    })
-// ------------------------------------------- jhanmela end
-
-    app.post('/artCraft', async(req, res) =>{
-        const newCraft = req.body;
-        console.log(newCraft);
-        const result = await artCollection.insertOne(newCraft); /* vul hoteo pare  */
-        res.send(result);
-
-    })
+        app.get('/artCraft', async (req, res) => {
+            const cursor = artCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+        app.get('/artCraft/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await artCollection.findOne(query)
+            res.send(result);
+        })
 
 
 
 
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    // await client.close();
-  }
+
+        app.post('/artCraft', async (req, res) => {
+            const newCraft = req.body;
+            console.log(newCraft);
+            const result = await artCollection.insertOne(newCraft);
+            res.send(result);
+
+        })
+
+        
+// myAddListCard
+
+        app.get("/myList/:email", async (req, res) => {
+            console.log(req.params.email);
+            const result = await artCollection.find({ email: req.params.email }).toArray();
+            res.send(result)
+          })
+
+
+
+
+
+
+        // Send a ping to confirm a successful connection
+        await client.db("admin").command({ ping: 1 });
+        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    } finally {
+        // Ensures that the client will close when you finish/error
+        // await client.close();
+    }
 }
 run().catch(console.dir);
 
