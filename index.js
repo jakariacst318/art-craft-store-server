@@ -48,9 +48,6 @@ async function run() {
         })
 
 
-
-
-
         app.post('/artCraft', async (req, res) => {
             const newCraft = req.body;
             console.log(newCraft);
@@ -59,17 +56,54 @@ async function run() {
 
         })
 
-        
-// myAddListCard
 
+        // myAddListCard
         app.get("/myList/:email", async (req, res) => {
             console.log(req.params.email);
             const result = await artCollection.find({ email: req.params.email }).toArray();
             res.send(result)
-          })
+        })
+
+        // Delete Card
+        app.delete('/artCraft/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await artCollection.deleteOne(query)
+            res.send(result);
+        })
 
 
+        app.get('/artCraft/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await artCollection.findOne(query)
+            res.send(result);
+        })
 
+        app.put('/artCraft/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true };
+            const updatedCraft = req.body;
+            const art = {
+
+                $set: {
+                    item: updatedCraft.item,
+                    subcategory: updatedCraft.subcategory,
+                    description: updatedCraft.description,
+                    price: updatedCraft.price,
+                    rating: updatedCraft.rating,
+                    customization: updatedCraft.customization,
+                    processing: updatedCraft.processing,
+                    stock: updatedCraft.stock,
+                    name: updatedCraft.name,
+                    email: updatedCraft.email,
+                    photo: updatedCraft.photo,
+                }
+            }
+            const result = await artCollection.updateOne(filter, art, options)
+            res.send(result)
+        })
 
 
 
